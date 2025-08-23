@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="theme-color" content="#0b0f19" />
+  <title>Text Summarizer AI — Shibuya</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg: #0b0f19;
+      --card: rgba(13,17,23,.55);
+      --card-hover: rgba(13,17,23,.7);
+      --border: rgba(255,255,255,.08);
+      --text: #eaf1ff;
+      --muted: #9aa3b2;
+      --accent1: #ff2d95;
+      --accent2: #00f5d4;
+      --accent3: #7a5cff;
+      --shadow: 0 10px 30px rgba(0,0,0,.45);
+      --mouseX: 50%;
+      --mouseY: 50%;
+    }
+
+    html, body { height: 100%; min-height: 100%; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans JP", sans-serif;
+      color: var(--text);
+      background: radial-gradient(1200px 800px at 10% 10%, rgba(255,45,149,.18), transparent 60%),
+                  radial-gradient(900px 700px at 90% 20%, rgba(0,245,212,.18), transparent 55%),
+                  radial-gradient(1000px 800px at 50% 110%, rgba(122,92,255,.18), transparent 60%),
+                  linear-gradient(var(--bg), var(--bg));
+      background-attachment: fixed;
+      overflow-x: hidden;
+      position: relative;
+      animation: bgMove 18s ease-in-out infinite alternate;
+      min-height: 100vh;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      background:
+        radial-gradient(400px 300px at var(--mouseX) var(--mouseY), rgba(255,255,255,.10), transparent 60%),
+        repeating-linear-gradient(180deg, transparent 0 2px, rgba(255,255,255,.02) 2px 3px);
+      mix-blend-mode: screen;
+      z-index: 0;
+    }
+
+    @keyframes bgMove {
+      0%   { background-position: 0px 0px, 0px 0px, 0px 0px, 0 0; }
+      100% { background-position: 30px -30px, -40px 20px, 20px 40px, 0 0; }
+    }
+
+    .wrap {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 8px;
+      box-sizing: border-box;
+    }
+
+    .card {
+      width: min(820px, 98vw);
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.02)), var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px) saturate(120%);
+      -webkit-backdrop-filter: blur(16px) saturate(120%);
+      padding: 28px;
+      position: relative;
+      transition: transform .2s ease, background .2s ease, border-color .2s ease;
+      box-sizing: border-box;
+      z-index: 1;
+    }
+
+    .card::before {
+      content: "";
+      position: absolute;
+      inset: -1px;
+      border-radius: 17px;
+      padding: 1px;
+      background: linear-gradient(135deg, var(--accent1), var(--accent3), var(--accent2));
+      -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor;
+              mask-composite: exclude;
+      opacity: .35;
+      filter: blur(.5px);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .card:hover {
+      background: var(--card-hover);
+    }
+
+    .title {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+      margin: 4px 0 14px;
+    }
+    h1 {
+      font-weight: 800;
+      font-size: clamp(1.4rem, 2.4vw, 2rem);
+      margin: 0;
+      line-height: 1.1;
+      background: linear-gradient(90deg, #fff, #e0e6ff 30%, #bfc8ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      text-shadow: 0 0 20px rgba(186, 206, 255, .25);
+    }
+    .jp {
+      font-family: "Noto Sans JP", Inter, sans-serif;
+      font-weight: 700;
+      letter-spacing: .06em;
+      color: #a7b3d1;
+      font-size: .95rem;
+      opacity: .85;
+    }
+
+    .subtitle {
+      color: var(--muted);
+      margin: 0 0 18px;
+      font-size: .98rem;
+    }
+
+    .inputs {
+      display: grid;
+      gap: 14px;
+      margin-top: 8px;
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 140px;
+      resize: vertical;
+      padding: 14px 14px 18px;
+      font-size: 1rem;
+      color: var(--text);
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      outline: none;
+      transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+      box-sizing: border-box;
+      word-break: break-word;
+    }
+    textarea::placeholder { color: #8d97aa; }
+
+    textarea:focus {
+      border-color: rgba(0,245,212,.45);
+      box-shadow:
+        0 0 0 4px rgba(0,245,212,.10),
+        0 10px 30px rgba(0,0,0,.25),
+        0 0 40px -10px rgba(0,245,212,.35);
+      background: rgba(255,255,255,.05);
+    }
+
+    .actions {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    button {
+      appearance: none;
+      border: 0;
+      color: #0a0e17;
+      font-weight: 700;
+      letter-spacing: .02em;
+      padding: 12px 18px;
+      border-radius: 12px;
+      cursor: pointer;
+      transition: transform .08s ease, filter .2s ease, box-shadow .25s ease;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.5), rgba(255,255,255,.2)) padding-box,
+        linear-gradient(135deg, var(--accent1), var(--accent3), var(--accent2)) border-box;
+      border: 1px solid transparent;
+      position: relative;
+      box-shadow:
+        0 6px 18px rgba(255,45,149,.25),
+        0 6px 26px rgba(0,245,212,.18);
+      min-width: 120px;
+      min-height: 44px;
+      font-size: 1rem;
+      box-sizing: border-box;
+      z-index: 3;
+    }
+    button::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 12px;
+      background: radial-gradient(120px 60px at var(--mouseX) var(--mouseY), rgba(255,255,255,.55), transparent 60%);
+      mix-blend-mode: screen;
+      pointer-events: none;
+      opacity: .6;
+      transition: opacity .2s ease;
+    }
+    button:hover::after { opacity: .85; }
+    button:hover { filter: saturate(110%); }
+    button:active { transform: translateY(1px) scale(.99); }
+    button:disabled {
+      background: linear-gradient(180deg, rgba(255,255,255,.15), rgba(255,255,255,.08));
+      color: #7a8498;
+      box-shadow: none;
+      cursor: not-allowed;
+    }
+
+    .summary {
+      margin-top: 14px;
+      padding: 14px 14px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.03);
+      border: 1px solid var(--border);
+      min-height: 42px;
+      color: #d9e2ff;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.02);
+      white-space: pre-wrap;
+      word-break: break-word;
+      box-sizing: border-box;
+    }
+
+    .orb {
+      position: absolute;
+      width: 220px;
+      height: 220px;
+      border-radius: 50%;
+      filter: blur(24px);
+      opacity: .28;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .orb.magenta { background: radial-gradient(circle at 30% 30%, rgba(255,45,149,.9), transparent 60%); top: -60px; left: -60px; animation: float1 12s ease-in-out infinite alternate; }
+    .orb.cyan { background: radial-gradient(circle at 60% 60%, rgba(0,245,212,.9), transparent 60%); bottom: -60px; right: -50px; animation: float2 14s ease-in-out infinite alternate; }
+
+    @keyframes float1 { from { transform: translate(0,0); } to { transform: translate(20px, 14px); } }
+    @keyframes float2 { from { transform: translate(0,0); } to { transform: translate(-16px, -10px); } }
+
+    .tilt {
+      transform: perspective(900px) rotateX(calc((var(--my, 50) - 50) * -0.08deg)) rotateY(calc((var(--mx, 50) - 50) * 0.12deg));
+      transform-style: preserve-3d;
+    }
+
+    @media (max-width: 700px) {
+      .card {
+        padding: 16px 6px;
+        width: 99vw;
+      }
+      .wrap {
+        padding: 18px 2px;
+      }
+      .summary, textarea {
+        font-size: .98rem;
+      }
+      .actions {
+        flex-direction: column;
+        gap: 10px;
+      }
+      button {
+        width: 100%;
+        min-width: 0;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .card {
+        padding: 8px 2px;
+      }
+      .summary, textarea {
+        font-size: .93rem;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card tilt" id="card">
+      <div class="orb magenta"></div>
+      <div class="orb cyan"></div>
+
+      <div class="title">
+        <h1>Text Summarizer AI</h1>
+        <span class="jp">渋谷</span>
+      </div>
+      <p class="subtitle">Concise, neon‑lit summaries with a Shibuya vibe.</p>
+
+      <div class="inputs">
+        <textarea id="inputText" placeholder="Paste your text here..."></textarea>
+        <div class="actions">
+          <button id="summarizeBtn">Summarize</button>
+        </div>
+        <div class="summary" id="summaryResult"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Keep your existing summarize behavior
+    document.getElementById('summarizeBtn').onclick = async function() {
+      const text = document.getElementById('inputText').value.trim();
+      const summaryDiv = document.getElementById('summaryResult');
+      if (!text) {
+        summaryDiv.textContent = 'Please enter some text.';
+        return;
+      }
+      this.disabled = true;
+      summaryDiv.textContent = 'Summarizing...';
+      try {
+        const response = await fetch('/summarize', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text })
+        });
+        if (!response.ok) throw new Error('Server error');
+        const data = await response.json();
+        summaryDiv.textContent = data.summary || 'No summary returned.';
+      } catch (err) {
+        summaryDiv.textContent = 'Error: ' + err.message;
+      }
+      this.disabled = false;
+    };
+
+    // Interactive Shibuya effects: parallax glow + card tilt + button sheen
+    const root = document.documentElement;
+    const card = document.getElementById('card');
+    const button = document.getElementById('summarizeBtn');
+
+    function updateMouseVars(e) {
+      const x = e.clientX / window.innerWidth * 100;
+      const y = e.clientY / window.innerHeight * 100;
+      root.style.setProperty('--mouseX', e.clientX + 'px');
+      root.style.setProperty('--mouseY', e.clientY + 'px');
+      card.style.setProperty('--mx', x.toFixed(2));
+      card.style.setProperty('--my', y.toFixed(2));
+    }
+
+    window.addEventListener('mousemove', updateMouseVars, { passive: true });
+    window.addEventListener('touchmove', (e) => {
+      if (!e.touches[0]) return;
+      updateMouseVars({ clientX: e.touches[0].clientX, clientY: e.touches[0].clientY });
+    }, { passive: true });
+
+    // Ensure the button sheen tracks pointer inside the button
+    button.addEventListener('mousemove', (e) => {
+      const rect = e.currentTarget.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      e.currentTarget.style.setProperty('--mouseX', x + 'px');
+      e.currentTarget.style.setProperty('--mouseY', y + 'px');
+    });
+  </script>
+</body>
+</html>
