@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Alpha AI — Advanced Chat</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+  <img src="1761661643974.jpg" alt="♦" class="logo-img" />
+</div>
+
+
+      <div class="sidebar-section">
+        <label for="profile" class="label">Profile Type</label>
+        <select id="profile" class="select">
+          <option value="general">General</option>
+          <option value="beginner">Beginner</option>
+          <option value="expert">Expert</option>
+          <option value="student">Student</option>
+          <option value="professional">Professional</option>
+          <option value="lover">Lover</option>
+        </select>
+      </div>
+
+      <div class="sidebar-section">
+        <button id="teachBtn" class="btn btn-secondary">
+          <span class="icon">+</span> Teach Alpha
+        </button>
+      </div>
+
+      <div class="sidebar-footer">
+        <p class="text-muted">Alpha AI v1.0</p>
+      </div>
+    </aside>
+
+    <main class="chat-main">
+      <div class="chat-window" id="chat">
+        </div>
+
+      <div class="chat-input-area">
+        <textarea
+          id="message"
+          placeholder="Ask Alpha AI a question..."
+          rows="1"
+        ></textarea>
+        <button id="send" class="btn btn-send">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+          >
+            <path
+              d="M3.477 14.885L19.263 12L3.477 9.115 3.486 4.708 21.056 12 3.486 19.292 3.477 14.885z"
+            />
+          </svg>
+        </button>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal hidden" id="teachModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2>Teach Alpha Custom Response</h2>
+        <button class="modal-close" id="teachClose">✕</button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label for="teach_q">Question (exact match)</label>
+          <input id="teach_q" type="text" placeholder="e.g., what is python" />
+        </div>
+
+        <div class="form-group">
+          <label for="teach_type">User Profile</label>
+          <select id="teach_type">
+            <option value="general">General</option>
+            <option value="beginner">Beginner</option>
+            <option value="expert">Expert</option>
+            <option value="student">Student</option>
+            <option value="professional">Professional</option>
+            <option value="lover">Lover</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="teach_a">Response</label>
+          <textarea id="teach_a" placeholder="Enter the custom response..."></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button id="teachSave" class="btn btn-primary">Save Response</button>
+        <button id="teachClose2" class="btn btn-secondary">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast hidden" id="toast">Message Saved!</div>
+
+  <script src="script.js"></script>
+  </body>
+</html>
