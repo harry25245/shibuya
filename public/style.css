@@ -1,0 +1,569 @@
+:root {
+  --bg: #0f1720;
+  --bg-secondary: #0b1220;
+  --card: #0f1725;
+  --border: rgba(255, 255, 255, 0.08); /* Slightly thicker border */
+  --text-primary: #e6eef8;
+  --text-muted: #9ca3af;
+  --accent: #7c3aed;
+  --accent-dark: #6d28d9;
+  --user-msg: #06b6d4;
+  --ai-msg: rgba(255, 255, 255, 0.05); /* Lighter AI background */
+  --success: #10b981;
+  --error: #ef4444;
+  --cyan-star: #00ffff; /* New variable for the star effect */
+  --send-btn-bg: #1f2937; /* Darker button background */
+  --send-btn-icon: #e6eef8;
+}
+
+/* Global Reset and Base Styles */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+  line-height: 1.6;
+  overflow: hidden; /* Prevent body scroll, container manages it */
+}
+
+/* --- AURORA BACKGROUND EFFECT --- */
+/* The background uses multiple radial gradients overlaid and slightly blurred */
+.app {
+  height: 100vh;
+  display: flex;
+  position: relative;
+  z-index: 1; /* Keep content above the pseudo-element background */
+  background-color: var(--bg);
+}
+
+.app::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+    opacity: 0.5; /* Control intensity */
+    filter: blur(100px); /* Massive blur for the aurora effect */
+    background: radial-gradient(circle at 10% 20%, #4f46e544 0%, transparent 40%),
+                radial-gradient(circle at 80% 90%, #6d28d933 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, #06b6d422 0%, transparent 40%);
+    animation: aurora-shift 20s infinite alternate;
+}
+
+@keyframes aurora-shift {
+    0% {
+        transform: translate(0, 0);
+    }
+    50% {
+        transform: translate(50px, -50px);
+    }
+    100% {
+        transform: translate(-50px, 50px);
+    }
+}
+
+/* --- SIDEBAR (unchanged width for desktop) --- */
+.sidebar {
+  width: 280px;
+  min-width: 280px;
+  background: var(--bg-secondary);
+  border-right: 1px solid var(--border);
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.logo {
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--text-primary);
+  margin-bottom: 30px;
+}
+
+.logo-icon {
+  color: var(--accent);
+  margin-right: 5px;
+}
+
+.sidebar-section {
+  margin-bottom: 20px;
+}
+
+.label {
+  display: block;
+  font-size: 14px;
+  color: var(--text-muted);
+  margin-bottom: 8px;
+}
+
+.select, .btn {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.select {
+  background: var(--card);
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+  appearance: none;
+}
+
+.btn-secondary {
+  background: var(--card);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.btn-secondary:hover {
+  background: rgba(124, 58, 237, 0.1);
+}
+
+.sidebar-footer {
+  padding-top: 20px;
+  border-top: 1px solid var(--border);
+}
+
+.text-muted {
+  color: var(--text-muted);
+  font-size: 12px;
+}
+
+/* --- CHAT MAIN AREA --- */
+.chat-main {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  position: relative;
+  /* Max width for readability on ultra-wide screens */
+  max-width: 1200px; 
+  margin: 0 auto; 
+}
+
+/* --- CHAT WINDOW --- */
+.chat-window {
+  flex-grow: 1;
+  overflow-y: auto;
+  padding: 20px;
+  padding-bottom: 120px; /* Space for the input area */
+  scroll-behavior: smooth;
+  /* Custom scrollbar for dark theme */
+  scrollbar-color: var(--accent) var(--bg-secondary);
+  scrollbar-width: thin;
+}
+
+.chat-window::-webkit-scrollbar {
+  width: 8px;
+}
+
+.chat-window::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 10px;
+}
+
+.chat-window::-webkit-scrollbar-track {
+  background: var(--bg-secondary);
+}
+
+/* --- MESSAGE STYLES --- */
+.message-row {
+  display: flex;
+  margin-bottom: 20px;
+  align-items: flex-start;
+}
+
+.user-message {
+  justify-content: flex-end;
+}
+
+.ai-message {
+  justify-content: flex-start;
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.user-avatar {
+  background: var(--user-msg);
+  color: var(--bg);
+  order: 2; /* Move avatar to the right for user */
+  margin-left: 10px;
+}
+
+.ai-avatar {
+  background: var(--accent);
+  color: white;
+  margin-right: 10px;
+}
+
+.message-content {
+  max-width: 80%;
+  padding: 12px 16px;
+  border-radius: 18px;
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
+.user-message .message-content {
+  background: var(--user-msg);
+  color: var(--bg);
+  border-bottom-right-radius: 4px;
+  order: 1;
+}
+
+.ai-message .message-content {
+  background: var(--ai-msg);
+  border: 1px solid var(--border);
+  border-bottom-left-radius: 4px;
+}
+
+/* --- INPUT AREA --- */
+.chat-input-area {
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  padding: 15px 20px;
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 10px;
+}
+
+.chat-input-area textarea {
+  flex-grow: 1;
+  padding: 12px 15px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  color: var(--text-primary);
+  font-size: 16px;
+  resize: none;
+  min-height: 50px;
+  max-height: 200px;
+  overflow-y: auto;
+  transition: border-color 0.2s;
+}
+
+.chat-input-area textarea:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* --- SEND BUTTON WITH ANIMATION --- */
+.btn-send {
+  width: 50px;
+  height: 50px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--send-btn-bg);
+  color: var(--send-btn-icon);
+  border: none;
+  border-radius: 8px;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
+  transition: background 0.2s, box-shadow 0.3s;
+}
+
+.btn-send svg {
+  width: 24px;
+  height: 24px;
+  fill: currentColor;
+  transition: transform 0.2s;
+  z-index: 2;
+}
+
+.btn-send:hover {
+  background: var(--accent);
+}
+
+/* Animation Container: The "Star Border" Effect */
+.btn-send::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: conic-gradient(transparent 0deg, transparent 90deg, var(--cyan-star) 180deg, var(--cyan-star) 270deg, transparent 360deg);
+    animation: rotate 3s linear infinite;
+    z-index: 1;
+}
+
+/* Inner border to mask the rotating gradient */
+.btn-send::after {
+    content: '';
+    position: absolute;
+    inset: 2px; /* Control the thickness of the star border */
+    background: var(--send-btn-bg); /* Use the button's background color */
+    border-radius: 6px; 
+    z-index: 1;
+}
+
+@keyframes rotate {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.btn-send:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* --- MODAL STYLES --- */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  transition: opacity 0.3s;
+}
+
+.modal.hidden {
+  display: none;
+  opacity: 0;
+}
+
+.modal-content {
+  background: var(--card);
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  animation: modal-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-header h2 {
+  font-size: 18px;
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.modal-body {
+  padding: 20px;
+}
+
+.form-group {
+  margin-bottom: 15px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.modal-content input[type="text"],
+.modal-content textarea,
+.modal-content select {
+  width: 100%;
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--bg);
+  color: var(--text-primary);
+  font-size: 15px;
+  resize: vertical;
+}
+
+.modal-footer {
+  padding: 15px 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: white;
+  border: none;
+  font-weight: 600;
+}
+
+.btn-primary:hover {
+  background: var(--accent-dark);
+}
+
+@keyframes modal-in {
+  from {
+    transform: scale(0.9) translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* --- TOAST NOTIFICATION --- */
+.toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  background: var(--success);
+  color: white;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 2000;
+  animation: slideInRight 0.3s ease-out;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
+
+.toast.hidden {
+  display: none;
+}
+
+.toast.error {
+  background: var(--error);
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* ======================================= */
+/* ====== 📱 AUTO ADJUSTABLE (RESPONSIVE) ====== */
+/* ======================================= */
+
+@media (max-width: 768px) {
+  .app {
+    flex-direction: column;
+    height: 100dvh; /* Use dynamic viewport height for mobile devices */
+  }
+
+  /* SIDEBAR: Hidden by default on mobile */
+  .sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 500;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-out;
+    display: none; /* Hide completely */
+  }
+  /* You would need JavaScript to add an "is-open" class and toggle its visibility/transform */
+
+  /* CHAT MAIN: Takes full width */
+  .chat-main {
+    flex-grow: 1;
+    width: 100%;
+    max-width: none;
+    height: 100dvh; /* Ensure it takes full available vertical space */
+  }
+
+  .chat-window {
+    padding: 15px;
+    padding-bottom: 90px; /* Adjust padding for smaller input area */
+  }
+  
+  /* MESSAGE STYLES: Allow content to take more space */
+  .message-content {
+    max-width: 90%; 
+    font-size: 15px;
+  }
+
+  /* INPUT AREA: Adjust padding and font size */
+  .chat-input-area {
+    padding: 10px 15px;
+  }
+
+  .chat-input-area textarea {
+    font-size: 14px;
+    min-height: 40px;
+    padding: 8px 12px;
+  }
+
+  .btn-send {
+    width: 45px;
+    height: 45px;
+    border-radius: 6px;
+  }
+}
+
+/* Tablet/Small Laptop breakpoint adjustments */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .sidebar {
+        width: 220px;
+        min-width: 220px;
+    }
+    .chat-main {
+        max-width: 800px;
+    }
+}
+
+/* --- NEW LOGO STYLING --- */
+.logo-img {
+  width: 100%; /* Make the image responsive to the sidebar width */
+  max-width: 180px; /* Adjust this value if needed */
+  height: auto;
+  margin-bottom: 30px;
+  border-radius: 8px; /* Optional: adds a slight curve to the corners */
+    }
